@@ -1,68 +1,51 @@
-#include <stdarg.h>
-#include <stdio.h>
+#include "libftprintf.h"
 
-int	check_type(char variable)
+int	print_var(char symbol, va_list cpy)
 {
-	switch(variable)
-	{
-		case 'c' :
-		return (1);
-		case 's' :
-		return (2);
-		case 'p' :
-		return (3);
-		case 'd' :
-		return (4);
-		case 'i' :
-		return (5);
-		case 'u' :
-		return (6);
-		case 'x' :
-		return (7);
-		case 'X' :
-		return (8);
-		case '%' :
-		return (9);
-	}
-	return (0);
-}
-
-int	*count_arg(char *str)
-{
-	int	*types;
-	int	i;
-	
-	i = 0;
-	while (*str)
-	{
-		while (*str != '%')
-			str++;
-		types[i++] = check_type(*str);
-	}
-	return (types);
-}
-
-void	print_var(int type, void *variable)
-{
-
+	if (symbol == 'd' || symbol == 'i')
+		return (print_nbr(va_arg(cpy, int)));
+	else if (symbol == 'c')
+		return (print_char(va_arg(cpy, int)));
+	else if (symbol == 's')
+		return (print_str(va_arg(cpy, char *)));
+	else if (symbol == 'p')
+		return (print_ptr(va_arg(cpy, void *)));
+	else if (symbol == 'u')
+		return (print_uns(va_arg(cpy, unsigned)));
+	else if (symbol == 'X')
+		return (print_upphex(va_arg(cpy, int)));
+	else if (symbol == 'x')
+		return (print_hex(va_arg(cpy, int)));
+	else if (symbol == '%')
+		return (write(1, "%", 1));
+	return (1);
 }
 
 void	ft_printf(char *str, ...)
 {
-	va_list params;
-	int		*types;
+	va_list	params;
 
 	va_start(params, str);
-	
-	types = count_arg(str);
-	while(*str)
+	while (*str)
 	{
 		if (*str == '%')
 		{
-			str += 2;
-			print_var[types[i]](va_arg(params, types[i]));
+			*str++;
+			print_var(*str, params);
+			*str++;
 		}
 		else
-			write(1, &str, 1);
+			write(1, &*str++, 1);
 	}
+	va_end(params);
 }
+/*
+int main()
+{
+	int c = 843;
+	char test = 'z';
+	char *z = &test;
+	char carac = 'y';
+	char *str1 = "ca fonctionne mais peut etre que ce char :";
+	printf("\n%p", z);
+}*/
